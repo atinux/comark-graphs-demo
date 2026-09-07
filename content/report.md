@@ -8,7 +8,7 @@ summary: Traffic, latency and delivery for the quarter, with the figures written
 # Platform Report — Q3 2026
 
 This whole page is one Markdown file. The prose is CommonMark, and every figure
-in it is a Comark component block that resolves to a
+in it is a [Comark](https://comark.dev) component block that resolves to a
 [markdown-graphs](https://mdx-graphs.kshv.me) React component at render time.
 No MDX, no compile step: the file is read and parsed on each request, so the
 same code path would serve Markdown arriving from a database or a model.
