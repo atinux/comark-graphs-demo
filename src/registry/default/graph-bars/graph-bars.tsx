@@ -1,0 +1,145 @@
+"use client"
+
+import { motion, useReducedMotion } from "motion/react"
+
+import { GraphArrow } from "@/registry/default/graph-frame/graph-arrow"
+import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
+import {
+  fillDelay,
+  graphTransition,
+  toneClass,
+  trackMarks,
+  type Glyphs,
+  type GraphPalette,
+} from "@/registry/default/graph-frame/graph-motion"
+import { cn } from "@/lib/utils"
+
+type BarSeries = {
+  label: string
+  values: number[]
+  size?: "sm" | "lg"
+}
+
+type GraphBarsProps = {
+  title: string
+  from: BarSeries
+  to: BarSeries
+  processor?: string
+  glyphs?: Glyphs
+  palette?: GraphPalette
+  corner?: string
+  className?: string
+}
+
+function MiniBars({
+  values,
+  height,
+  delay = 0,
+  tone = "accent",
+  fill,
+  palette,
+}: {
+  values: number[]
+  height: number
+  delay?: number
+  tone?: "accent" | "muted"
+  fill: string
+  palette?: GraphPalette
+}) {
+  const reduce = useReducedMotion()
+  const max = Math.max(...values, 1)
+
+  return (
+    <div className="flex items-end gap-1">
+      {values.map((value, index) => {
+        const level = Math.round((value / max) * (height - 1))
+
+        return (
+          <span className="flex w-[1ch] flex-col justify-end" key={index}>
+            {Array.from({ length: height }, (_, row) => {
+              const fromBottom = height - 1 - row
+              const on = fromBottom <= level
+
+              return (
+                <motion.span
+                  className={cn(
+                    "h-[1em] w-full text-center",
+                    on
+                      ? tone === "accent"
+                        ? toneClass(palette, "primary")
+                        : toneClass(palette, "secondary")
+                      : "text-transparent"
+                  )}
+                  initial={reduce || !on ? false : { opacity: 0 }}
+                  key={row}
+                  transition={graphTransition(reduce, {
+                    delay: delay + fillDelay(reduce, index, 0.03),
+                  })}
+                  viewport={{ once: true }}
+                  whileInView={{ opacity: 1 }}
+                >
+                  {on ? fill : " "}
+                </motion.span>
+              )
+            })}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
+function GraphBars({
+  title,
+  from,
+  to,
+  processor,
+  glyphs,
+  palette,
+  corner,
+  className,
+}: GraphBarsProps) {
+  const marks = trackMarks(glyphs)
+  const fromHeight = from.size === "lg" ? 8 : 5
+  const toHeight = to.size === "lg" ? 8 : 5
+
+  return (
+    <Graph title={title} className={className} corner={corner}>
+      <GraphBody>
+        <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-end sm:justify-center sm:gap-8">
+          <div className="flex flex-col items-center gap-3">
+            <MiniBars
+              delay={0.04}
+              fill={marks.fill}
+              height={fromHeight}
+              palette={palette}
+              tone="muted"
+              values={from.values}
+            />
+            <p className={toneClass(palette, "secondary")}>{from.label}</p>
+          </div>
+
+          <div className="flex items-center justify-center gap-3 text-graph-muted max-sm:rotate-90">
+            <GraphArrow />
+            {processor ? <span>{processor}</span> : null}
+            <GraphArrow />
+          </div>
+
+          <div className="flex flex-col items-center gap-3">
+            <MiniBars
+              delay={0.16}
+              fill={marks.fill}
+              height={toHeight}
+              palette={palette}
+              values={to.values}
+            />
+            <p className="text-foreground">{to.label}</p>
+          </div>
+        </div>
+      </GraphBody>
+    </Graph>
+  )
+}
+
+export { GraphBars }
+export type { BarSeries, GraphBarsProps }

@@ -1,0 +1,141 @@
+"use client"
+
+import type { ReactNode } from "react"
+
+import { motion, useReducedMotion } from "motion/react"
+
+import {
+  Graph,
+  GraphBody,
+  GraphRule,
+} from "@/registry/default/graph-frame/graph-frame"
+import {
+  fadeUp,
+  staggerList,
+} from "@/registry/default/graph-frame/graph-motion"
+import { cn } from "@/lib/utils"
+
+type GraphAlign = "left" | "right"
+
+function RuleY() {
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-y-0 left-0 graph-rule-y"
+    />
+  )
+}
+
+type GraphTableProps = {
+  title: string
+  headers: string[]
+  rows: ReactNode[][]
+  footer?: ReactNode[]
+  align?: GraphAlign[]
+  corner?: string
+  className?: string
+}
+
+function GraphTable({
+  title,
+  headers,
+  rows,
+  footer,
+  align,
+  corner,
+  className,
+}: GraphTableProps) {
+  const reduce = useReducedMotion()
+  const item = fadeUp(reduce)
+  const list = staggerList(reduce, 0.04)
+
+  return (
+    <Graph title={title} className={className} corner={corner}>
+      <GraphBody className="px-3 py-6 sm:px-6 sm:py-8">
+        <div className="@container graph-scroll-x">
+          <table className="w-full min-w-lg border-separate border-spacing-0">
+            <thead>
+              <tr>
+                {headers.map((header, index) => (
+                  <th
+                    key={header}
+                    className={cn(
+                      "relative px-3 pb-3 font-normal whitespace-nowrap text-foreground",
+                      (align?.[index] ?? (index === 0 ? "left" : "right")) ===
+                        "right"
+                        ? "text-right"
+                        : "text-left"
+                    )}
+                  >
+                    {index > 0 ? <RuleY /> : null}
+                    {header}
+                  </th>
+                ))}
+              </tr>
+              <tr>
+                <th colSpan={headers.length} className="p-0">
+                  <GraphRule />
+                </th>
+              </tr>
+            </thead>
+            <motion.tbody
+              initial={reduce ? false : "hidden"}
+              variants={list}
+              viewport={{ once: true, amount: 0.4 }}
+              whileInView="show"
+            >
+              {rows.map((row, rowIndex) => (
+                <motion.tr key={rowIndex} variants={item}>
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className={cn(
+                        "relative px-3 py-2.5 whitespace-nowrap",
+                        (align?.[cellIndex] ??
+                          (cellIndex === 0 ? "left" : "right")) === "right"
+                          ? "text-right tabular-nums"
+                          : "text-left"
+                      )}
+                    >
+                      {cellIndex > 0 ? <RuleY /> : null}
+                      {cell}
+                    </td>
+                  ))}
+                </motion.tr>
+              ))}
+            </motion.tbody>
+            {footer ? (
+              <tfoot>
+                <tr>
+                  <td colSpan={headers.length} className="pt-2 pb-3">
+                    <GraphRule />
+                  </td>
+                </tr>
+                <tr>
+                  {footer.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className={cn(
+                        "relative px-3 pt-1 whitespace-nowrap",
+                        (align?.[cellIndex] ??
+                          (cellIndex === 0 ? "left" : "right")) === "right"
+                          ? "text-right tabular-nums"
+                          : "text-left"
+                      )}
+                    >
+                      {cellIndex > 0 ? <RuleY /> : null}
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
+            ) : null}
+          </table>
+        </div>
+      </GraphBody>
+    </Graph>
+  )
+}
+
+export { GraphTable }
+export type { GraphTableProps }

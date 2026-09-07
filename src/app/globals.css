@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------------------------------------------------------------------------
+   Theme tokens
+   The `--graph-*` variables are the contract the markdown-graphs components
+   expect. Everything else is this demo's own shell.
+   --------------------------------------------------------------------------- */
+
+@theme inline {
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono--font-feature-settings: "ss01" 1, "zero" 1;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ring: var(--ring);
+
+  --color-graph-accent: var(--graph-accent);
+  --color-graph-accent-2: var(--graph-accent-2);
+  --color-graph-accent-3: var(--graph-accent-3);
+  --color-graph-frame: var(--graph-frame);
+  --color-graph-muted: var(--graph-muted);
+  --color-graph-faint: var(--graph-faint);
+  --color-contrast-14: var(--contrast-14);
+  --color-contrast-23: var(--contrast-23);
+  --color-contrast-45: var(--contrast-45);
+  --color-contrast-70: var(--contrast-70);
+
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+:root {
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.205 0 0);
+  --border: oklch(0.205 0 0 / 0.1);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --ring: oklch(0.55 0.16 255);
+
+  --graph-accent: oklch(0.5 0.14 228);
+  --graph-accent-2: oklch(0.48 0.18 259);
+  --graph-accent-3: oklch(0.5 0.14 248);
+  --graph-frame: oklch(0.205 0 0 / 0.28);
+  --graph-muted: oklch(0.52 0 0);
+  --graph-faint: oklch(0.82 0 0);
+  --contrast-14: oklch(0.88 0 0);
+  --contrast-23: oklch(0.76 0 0);
+  --contrast-45: oklch(0.48 0 0);
+  --contrast-70: oklch(0.28 0 0);
+
+  color-scheme: light;
+}
+
+.dark {
+  --background: oklch(0.11 0 0);
+  --foreground: oklch(0.86 0 0);
+  --border: oklch(0.28 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.62 0 0);
+  --ring: oklch(0.68 0.12 255);
+
+  --graph-accent: oklch(0.77 0.15 228);
+  --graph-accent-2: oklch(0.68 0.18 259);
+  --graph-accent-3: oklch(0.72 0.15 248);
+  --graph-frame: oklch(0.48 0 0);
+  --graph-muted: oklch(0.52 0 0);
+  --graph-faint: oklch(0.28 0 0);
+  --contrast-14: oklch(0.22 0 0);
+  --contrast-23: oklch(0.34 0 0);
+  --contrast-45: oklch(0.62 0 0);
+  --contrast-70: oklch(0.84 0 0);
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   markdown-graphs utilities
+   The registry components reference these class names directly.
+   --------------------------------------------------------------------------- */
+
+@utility graph-frame {
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      var(--graph-frame) 0 2px,
+      transparent 2px 7px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--graph-frame) 0 2px,
+      transparent 2px 7px
+    ),
+    repeating-linear-gradient(
+      to right,
+      var(--graph-frame) 0 2px,
+      transparent 2px 7px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      var(--graph-frame) 0 2px,
+      transparent 2px 7px
+    );
+  background-repeat: repeat-x, repeat-y, repeat-x, repeat-y;
+  background-position:
+    0 0,
+    100% 0,
+    0 100%,
+    0 0;
+  background-size:
+    100% 1px,
+    1px 100%,
+    100% 1px,
+    1px 100%;
+}
+
+@utility graph-rule {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--graph-frame) 0 2px,
+    transparent 2px 7px
+  );
+}
+
+@utility graph-rule-y {
+  width: 1px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--graph-frame) 0 2px,
+    transparent 2px 7px
+  );
+}
+
+@utility graph-scroll-x {
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply font-sans antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--graph-accent);
+    color: var(--background);
+  }
+}
+
+/* Comark's streaming caret animates with `animation: pulse`, applied inline. */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Prose for the Markdown that Comark renders around the graphs
+   --------------------------------------------------------------------------- */
+
+@utility comark-prose {
+  /* Every rule below is guarded with `:not(figure *)`.
+     The graph components render their own `p`, `ul`, `li` and `table` markup
+     inside a `figure`, and prose styling has no business reaching into it —
+     without the guard, the list bullet shows up above every stat value. */
+
+  & > * + * {
+    margin-top: 1.5rem;
+  }
+
+  & h1:not(figure *) {
+    @apply font-mono text-2xl leading-tight tracking-tight sm:text-3xl;
+  }
+
+  & h2:not(figure *) {
+    @apply mt-16 font-mono text-base tracking-[0.08em] uppercase;
+  }
+
+  & h3:not(figure *) {
+    @apply mt-10 font-mono text-base tracking-tight;
+  }
+
+  & p:not(figure *),
+  & li:not(figure *) {
+    @apply text-[0.95rem] leading-relaxed;
+  }
+
+  & p:not(figure *),
+  & ul:not(figure *),
+  & ol:not(figure *) {
+    @apply max-w-[68ch];
+  }
+
+  & ul:not(figure *) {
+    @apply list-none space-y-2;
+  }
+
+  & ul:not(figure *) > li::before {
+    @apply text-graph-accent mr-2 content-["-"];
+  }
+
+  & ol:not(figure *) {
+    @apply list-decimal space-y-2 pl-5;
+  }
+
+  & a:not(figure *) {
+    @apply text-graph-accent underline decoration-dotted underline-offset-4;
+  }
+
+  & strong:not(figure *) {
+    @apply font-medium text-foreground;
+  }
+
+  & code:not(figure *) {
+    @apply bg-muted font-mono text-[0.85em];
+    padding: 0.1em 0.35em;
+  }
+
+  & pre:not(figure *) {
+    @apply graph-frame graph-scroll-x bg-transparent p-5 font-mono text-xs;
+  }
+
+  & pre:not(figure *) code {
+    @apply bg-transparent p-0;
+  }
+
+  & blockquote:not(figure *) {
+    @apply border-graph-accent text-muted-foreground border-l pl-4 italic;
+  }
+
+  & hr:not(figure *) {
+    @apply graph-rule my-12 border-0;
+  }
+
+  /* Graph figures get their own breathing room */
+  & figure {
+    @apply my-12;
+  }
+}
