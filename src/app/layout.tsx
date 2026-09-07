@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { GeistMono } from "geist/font/mono"
 import { GeistSans } from "geist/font/sans"
+import { Analytics } from "@vercel/analytics/next"
 
 import { SiteHeader } from "@/components/site-header"
 import "./globals.css"
@@ -43,6 +44,7 @@ export default function RootLayout({
         <main className="mx-auto w-full max-w-4xl px-5 pb-24 sm:px-8">
           {children}
         </main>
+        <Analytics />
       </body>
     </html>
   )
