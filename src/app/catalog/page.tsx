@@ -8,6 +8,9 @@ import { readDoc } from "@/lib/content"
 
 export const metadata: Metadata = { title: "Catalog" }
 
+// Parsed per request, same as the report page.
+export const dynamic = "force-dynamic"
+
 export default async function CatalogPage() {
   const doc = await readDoc("catalog")
 

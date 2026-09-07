@@ -5,8 +5,15 @@ A demo of writing charts **inside a plain `.md` file**.
 The prose is CommonMark. The figures are [Comark](https://comark.dev) component
 blocks that resolve to [markdown-graphs](https://mdx-graphs.kshv.me) React
 components — ASCII-framed tables, plots, heatmaps, flows and the rest — with no
-MDX and no compile step. The Markdown is read off disk and parsed at request
-time, so editing `content/report.md` and reloading is the whole loop.
+MDX and no compile step. Editing `content/report.md` and reloading is the whole
+loop.
+
+The content pages set `dynamic = "force-dynamic"`, so the Markdown really is
+read and parsed per request rather than baked in at build time — which is the
+property that matters, since the same code path would serve Markdown arriving
+from a database or a model. Drop that line and Next prerenders the figures
+instead; the same source works either way. (The `.md` files here live in the
+repo, so changing *this* demo's content is still a deploy.)
 
 ```mdc
 ::graph-table

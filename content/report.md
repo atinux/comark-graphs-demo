@@ -10,7 +10,8 @@ summary: Traffic, latency and delivery for the quarter, with the figures written
 This whole page is one Markdown file. The prose is CommonMark, and every figure
 in it is a Comark component block that resolves to a
 [markdown-graphs](https://mdx-graphs.kshv.me) React component at render time.
-No MDX, no compile step: the file is read off disk and parsed on each request.
+No MDX, no compile step: the file is read and parsed on each request, so the
+same code path would serve Markdown arriving from a database or a model.
 
 ::graph-stat
 ---
